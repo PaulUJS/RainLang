@@ -3,6 +3,27 @@ use crate::LiteralVal::*;
 use crate::TokenType::*;
 
 #[derive(Debug)]
+pub enum Statement {
+    PrintStatement { expr: Expression },
+    ExprStatement { expr: Expression },
+    VarStatement { name: Token, init: Expression },
+}
+
+impl Statement {
+    pub fn evaluate(self: &mut Self) -> LiteralVal {
+        match self {
+            Statement::ExprStatement { expr } => expr.evaluate(),
+            Statement::PrintStatement { expr } => expr.evaluate(),
+            Statement::VarStatement { name, init } => todo!(),
+        }
+    }
+
+    pub fn interpret(self: &mut Self) {
+        println!("{:#?}", self.evaluate());
+    }
+}
+
+#[derive(Debug)]
 pub enum Expression {
     Binary { left: Box<Expression>, operator: Token, right: Box<Expression> },
     Unary { operator: Token, right: Box<Expression> },
@@ -56,7 +77,4 @@ impl Expression {
         }
     }
 
-    pub fn interpret(self: &mut Self) {
-        println!("{:#?}", self.evaluate());
-    }
 }

@@ -31,5 +31,7 @@ fn tokenize_file(contents: &str) {
 }
 fn parse_file(contents: Vec<Token>) {
    let mut parser = Parser::new(contents);
-   parser.parse();
+   for mut i in parser.parse() {
+       i.interpret();
+   }
 }

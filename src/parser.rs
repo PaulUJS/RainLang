@@ -3,6 +3,7 @@ use crate::syntaxtree::*;
 use crate::TokenType::*;
 use crate::LiteralVal::*;
 use crate::Expression::*;
+use crate::Statement::*;
 
 macro_rules! matchtokens {
     ($parser:ident, $($token:ident),+) => {{
@@ -139,8 +140,45 @@ impl Parser {
     fn peek(self: &mut Self) -> Token {
         self.tokens[self.index].clone()
     }
+    
+    fn expression_statement(self: &mut Self) -> Statement {
+        let expr = self.expression();
+        return ExprStatement { expr: expr };
+    }
 
-    pub fn parse(self: &mut Self) {
-        self.expression().interpret();
+    fn print_statement(self: &mut Self) -> Statement {
+        let value = self.expression();
+        return PrintStatement { expr: value };
+    }
+
+    fn statement(self: &mut Self) -> Statement {
+        if matchtokens!(self, PRINT) {
+            return self.print_statement();
+        }
+        return self.expression_statement()
+    }
+
+    fn var_declaration(self: &mut Self) -> Statement {
+        let mut initializer;
+        if matchtokens!(self, Equal) {
+            initializer =  self.expression();
+        }
+        return VarStatement { name: todo!(), init: initializer };
+    }
+
+    fn declaration(self: &mut Self) -> Statement {
+        if matchtokens!(self, Var) {
+            return self.var_declaration();
+        }
+        return self.statement();
+    }
+
+    pub fn parse(self: &mut Self) -> Vec<Statement> {
+        let mut statements = vec![];
+        while !self.is_at_end() {
+            statements.push(self.declaration());
+            self.advance();
+        };
+        return statements;
     }
 }

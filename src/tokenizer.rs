@@ -19,6 +19,7 @@ pub enum LiteralVal {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
+    PRINT,
     Fn,
     Var,
     Start,
