@@ -81,7 +81,27 @@ impl Parser {
     }
 
     fn primary(self: &mut Self) -> Expression {
-        todo!()
+        let mut result: Expression;
+        if matchtokens!(self, LeftParen) {
+            let mut expr = self.expression();
+            result = Expression::Grouping { expr: Box::from(expr) };
+        } else {
+            if matchtokens!(self, FALSE) {
+                result = Literal { value: BoolVal(false) };
+            }
+            if matchtokens!(self, TRUE) {
+                result = Literal { value: BoolVal(true) };
+            }
+            if matchtokens!(self, NULL) {
+                result = Literal { value: NullVal };
+            }
+            if matchtokens!(self, StringLiteral, NumLiteral) {
+                result = Literal { value: self.previous().literal };
+            } else {
+                result = Literal { value: NullVal };
+            };
+        };
+        return result;
     }
 
     pub fn match_token(self: &mut Self, token: TokenType) -> bool {
@@ -121,6 +141,6 @@ impl Parser {
     }
 
     pub fn parse(self: &mut Self) {
-        todo!()
+        self.expression().interpret();
     }
 }

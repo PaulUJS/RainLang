@@ -26,9 +26,10 @@ fn read_file() -> Result<(), String> {
 
 fn tokenize_file(contents: &str) {
     let mut scanner  = Tokenizer::new(contents);
-    scanner.split_tokens();
-    scanner.print_tokens();
+    let mut tokens = scanner.split_tokens();
+    parse_file(tokens.to_vec());
 }
-fn parse_file(contents: Vec<Token>) -> Result<(), String> {
-    todo!()
+fn parse_file(contents: Vec<Token>) {
+   let mut parser = Parser::new(contents);
+   parser.parse();
 }

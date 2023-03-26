@@ -14,6 +14,7 @@ pub enum LiteralVal {
     Operator,
     Grouping,
     LOOP,
+    NullVal,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -48,8 +49,14 @@ pub enum TokenType {
     LessEqual,
     Greater,
     GreaterEqual,
+    TRUE,
+    FALSE,
+
+    StringLiteral,
+    NumLiteral,
 
     Return,
+    NULL,
     Eof,
 }
 
@@ -106,32 +113,52 @@ impl Tokenizer {
                 "end" => self.add_token(End, "", Terminator),
                 "then" => self.add_token(Then, "", Terminator),
                 "do" => self.add_token(Do, "", Terminator),
+                "true" => self.add_token(TRUE, "", BoolVal(true)),
+                "false" => self.add_token(FALSE, "", BoolVal(false)),
                 "return" => self.add_token(Return, "", Terminator),
                 "var" => self.add_token(Var, "", Identifier("var".to_string())),
                 "for" => self.add_token(FOR, "", LOOP),
                 "while" => self.add_token(WHILE, "", LOOP),
                 "in" => self.add_token(In, "", Comparison),
-                "+" => self.add_token(Plus, "", Operator),
-                "-" => self.add_token(Minus, "", Operator),
-                "*" => self.add_token(Star, "", Operator),
-                "/" => self.add_token(Slash, "", Operator),
-                ";" => self.add_token(SemiColon, "", Terminator),
-                "=" => self.add_token(Equal, "", Comparison),
-                "==" => self.add_token(EqualEqual, "", Comparison),
-                "!" => self.add_token(Bang, "", Comparison),
-                "!=" => self.add_token(BangEqual, "", Comparison),
-                ">" => self.add_token(Greater, "", Comparison),
-                ">=" => self.add_token(GreaterEqual, "", Comparison),
-                "<" => self.add_token(Less, "", Comparison),
-                "<=" => self.add_token(LessEqual, "", Comparison),
-                ")" => self.add_token(LeftParen, "", Grouping),
-                "(" => self.add_token(RightParen, "", Grouping),
+                "+" => self.add_token(Plus, "+", Operator),
+                "-" => self.add_token(Minus, "-", Operator),
+                "*" => self.add_token(Star, "*", Operator),
+                "/" => self.add_token(Slash, "/", Operator),
+                ";" => self.add_token(SemiColon, ";", Terminator),
+                "=" => self.add_token(Equal, "=", Comparison),
+                "==" => self.add_token(EqualEqual, "==", Comparison),
+                "!" => self.add_token(Bang, "!", Comparison),
+                "!=" => self.add_token(BangEqual, "!=", Comparison),
+                ">" => self.add_token(Greater, ">", Comparison),
+                ">=" => self.add_token(GreaterEqual, ">=", Comparison),
+                "<" => self.add_token(Less, "<", Comparison),
+                "<=" => self.add_token(LessEqual, "<=", Comparison),
+                ")" => self.add_token(LeftParen, ")", Grouping),
+                "(" => self.add_token(RightParen, "(", Grouping),
                 "'" => self.add_token(Quote, "", StringVal("'".to_string())),
-                _ => todo!(),
+                "Null" => self.add_token(NULL, "", NullVal),
+                i => {
+                    if self.is_num(i) {
+                        let val = i.parse::<i64>();
+                        match val {
+                            Ok(value) => self.add_token(NumLiteral, i, IntVal(value)),
+                            Err(_) => println!("Unable to validate type of {}", i.to_string()),
+                        };
+                    };
+                },
             };
         }
         self.add_token(Eof, "", Terminator);
         return &self.tokens;
+    }
+    
+    fn is_num(self: &mut Self, num: &str) -> bool {
+        for i in num.chars() {
+            if !i.is_numeric() {
+                return false;
+            }
+        }
+        return true;
     }
 
     fn add_token(self: &mut Self, token: TokenType, lexeme: &str, literal: LiteralVal) {
@@ -144,9 +171,5 @@ impl Tokenizer {
             literal: literal,
             line: self.current,
         });
-    }
-
-    pub fn print_tokens(self: &mut Self) {
-        println!("{:#?}", self.tokens);
     }
 }
