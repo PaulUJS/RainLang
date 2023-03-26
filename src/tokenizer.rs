@@ -1,18 +1,33 @@
+use crate::LiteralVal::*;
+use crate::TokenType::*;
 
+#[derive(Debug, PartialEq, Clone)]
 pub enum LiteralVal {
     IntVal(i64),
     FloatVal(f64),
     BoolVal(bool),
     StringVal(String),
+    Identifier(String),
+    Function,
+    Terminator,
+    Comparison,
+    Operator,
+    Grouping,
+    LOOP,
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     Fn,
+    Var,
     Start,
     End,
     IF,
     ELSE,
+    ELSEIF,
+    FOR,
     WHILE,
+    In,
     Then,
     Do,
 
@@ -20,7 +35,7 @@ pub enum TokenType {
     LeftParen,
     RightParen,
     Quote,
-    
+
     Plus,
     Minus,
     Star,
@@ -35,16 +50,18 @@ pub enum TokenType {
     GreaterEqual,
 
     Return,
-    Eof
+    Eof,
 }
 
+#[derive(Debug, Clone)]
 pub struct Token {
-    tokentype: TokenType,
-    lexeme: String,
-    literal: LiteralVal,
-    line: u64,
+    pub tokentype: TokenType,
+    pub lexeme: String,
+    pub literal: LiteralVal,
+    pub line: u64,
 }
 
+#[derive(Debug)]
 pub struct Tokenizer {
     source: String,
     tokens: Vec<Token>,
@@ -62,43 +79,74 @@ impl Tokenizer {
         }
     }
 
-    pub fn split_tokens(self: &mut Self) -> Result<(), String> {
-       let start = self.source
-           .replace("(", " ( ")
-           .replace(")", " ) ")
-           .replace("'", " ' ")
-           .replace(";", " ; ");
+    pub fn split_tokens(self: &mut Self) -> &Vec<Token> {
+        let start = self
+            .source
+            .replace("(", " ( ")
+            .replace(")", " ) ")
+            .replace("'", " ' ")
+            .replace(";", " ; ");
 
         let mut end: Vec<&str> = start.split_whitespace().collect();
         self.scan_tokens(end.as_mut_slice())
     }
 
-    fn scan_tokens(self: &mut Self, arr: &mut [&str]) -> Result<(), String> {
+    fn scan_tokens(self: &mut Self, arr: &mut [&str]) -> &Vec<Token> {
+        println!("{:?}", arr);
         for i in arr {
             if self.current < self.line {
                 self.current += 1;
             }
             match i as &str {
-                "fn" => todo!(),
-                "if" => todo!(),
-                "else" => todo!(),
-                "else if" => todo!(),
-                "start" => todo!(),
-                "end" => todo!(),
-                "then" => todo!(),
-                "do" => todo!(),
-                "return" => todo!(),
+                "fn" => self.add_token(Fn, "", Function),
+                "if" => self.add_token(IF, "", Comparison),
+                "else" => self.add_token(ELSE, "", Comparison),
+                "else if" => self.add_token(ELSEIF, "", Comparison),
+                "start" => self.add_token(Start, "", Terminator),
+                "end" => self.add_token(End, "", Terminator),
+                "then" => self.add_token(Then, "", Terminator),
+                "do" => self.add_token(Do, "", Terminator),
+                "return" => self.add_token(Return, "", Terminator),
+                "var" => self.add_token(Var, "", Identifier("var".to_string())),
+                "for" => self.add_token(FOR, "", LOOP),
+                "while" => self.add_token(WHILE, "", LOOP),
+                "in" => self.add_token(In, "", Comparison),
+                "+" => self.add_token(Plus, "", Operator),
+                "-" => self.add_token(Minus, "", Operator),
+                "*" => self.add_token(Star, "", Operator),
+                "/" => self.add_token(Slash, "", Operator),
+                ";" => self.add_token(SemiColon, "", Terminator),
+                "=" => self.add_token(Equal, "", Comparison),
+                "==" => self.add_token(EqualEqual, "", Comparison),
+                "!" => self.add_token(Bang, "", Comparison),
+                "!=" => self.add_token(BangEqual, "", Comparison),
+                ">" => self.add_token(Greater, "", Comparison),
+                ">=" => self.add_token(GreaterEqual, "", Comparison),
+                "<" => self.add_token(Less, "", Comparison),
+                "<=" => self.add_token(LessEqual, "", Comparison),
+                ")" => self.add_token(LeftParen, "", Grouping),
+                "(" => self.add_token(RightParen, "", Grouping),
+                "'" => self.add_token(Quote, "", StringVal("'".to_string())),
                 _ => todo!(),
             };
         }
-        Ok(())
+        self.add_token(Eof, "", Terminator);
+        return &self.tokens;
     }
 
     fn add_token(self: &mut Self, token: TokenType, lexeme: &str, literal: LiteralVal) {
-        self.tokens.push(Token { tokentype: token, lexeme: lexeme.to_string(), literal: literal, line: self.current });
+        if literal == Terminator {
+            self.line += 1
+        };
+        self.tokens.push(Token {
+            tokentype: token,
+            lexeme: lexeme.to_string(),
+            literal: literal,
+            line: self.current,
+        });
     }
 
-    fn add_token_literal(self: &mut Self) -> Token {
-        todo!()
+    pub fn print_tokens(self: &mut Self) {
+        println!("{:#?}", self.tokens);
     }
 }
