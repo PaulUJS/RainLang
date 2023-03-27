@@ -74,6 +74,7 @@ pub struct Tokenizer {
     source: String,
     tokens: Vec<Token>,
     line: u64,
+    writing: bool,
     current: u64,
 }
 
@@ -83,6 +84,7 @@ impl Tokenizer {
             source: _source.to_string(),
             tokens: vec![],
             line: 1,
+            writing: false,
             current: 1,
         }
     }
@@ -101,11 +103,12 @@ impl Tokenizer {
 
     fn scan_tokens(self: &mut Self, arr: &mut [&str]) -> &Vec<Token> {
         println!("{:?}", arr);
-        for i in arr {
+        let mut index = 0;
+        while index < arr.len() {
             if self.current < self.line {
                 self.current += 1;
             }
-            match i as &str {
+            match arr[index] {
                 "fn" => self.add_token(Fn, "", Function),
                 "if" => self.add_token(IF, "", Comparison),
                 "else" => self.add_token(ELSE, "", Comparison),
@@ -136,20 +139,53 @@ impl Tokenizer {
                 "<=" => self.add_token(LessEqual, "<=", Comparison),
                 ")" => self.add_token(LeftParen, ")", Grouping),
                 "(" => self.add_token(RightParen, "(", Grouping),
-                "'" => self.add_token(Quote, "", StringVal("'".to_string())),
+                "'" => {
+                    index += 1;
+                    self.add_token(Quote, "", Grouping);
+                    let mut finalstr = "".to_owned();
+
+                    while arr[index] != "'" {
+                        finalstr.push_str(arr[index]);
+                        index += 1;
+                    }
+                    index += 1;
+                    self.add_token(StringLiteral, &finalstr, StringVal(finalstr.to_string()));
+                    self.add_token(Quote, "", Grouping) 
+                },
+                "print" => {
+                    if arr[index+1] == "'" {
+                        index += 1;
+                    }
+
+                    let mut finalstr = "".to_owned();
+                    while arr[index + 1] != "'" {
+                        if finalstr != "" {
+                            finalstr.push_str(" ");
+                            finalstr.push_str(arr[index + 1]);
+                            index += 1;
+                        } else {
+                            finalstr.push_str(arr[index + 1]);
+                            index += 1;
+                        }
+                    }
+                    index += 1;                        
+                    self.add_token(PRINT, &finalstr, StringVal(finalstr.to_string()));
+                },
                 "Null" => self.add_token(NULL, "", NullVal),
-                i => {
-                    if self.is_num(i) {
-                        let val = i.parse::<i64>();
+                _ => { 
+                    if self.is_num(arr[index]) {
+                        let val = arr[index].parse::<i64>();
                         match val {
-                            Ok(value) => self.add_token(NumLiteral, i, IntVal(value)),
-                            Err(_) => println!("Unable to validate type of {}", i.to_string()),
+                            Ok(value) => self.add_token(NumLiteral, arr[index], IntVal(value)),
+                            Err(_) => println!("Unable to validate type of {}", arr[index].to_string()),
                         };
                     };
                 },
             };
+            index += 1;
         }
         self.add_token(Eof, "", Terminator);
+       //  println!("{:#?}", self.tokens);
         return &self.tokens;
     }
     

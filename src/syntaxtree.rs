@@ -12,8 +12,12 @@ pub enum Statement {
 impl Statement {
     pub fn evaluate(self: &mut Self) -> LiteralVal {
         match self {
-            Statement::ExprStatement { expr } => expr.evaluate(),
-            Statement::PrintStatement { expr } => expr.evaluate(),
+            Statement::ExprStatement { expr } => {
+                expr.evaluate()
+            },
+            Statement::PrintStatement { expr } => {
+                expr.evaluate()
+            },
             Statement::VarStatement { name, init } => todo!(),
         }
     }
@@ -73,7 +77,7 @@ impl Expression {
                     _ => todo!(),
                 }
             },
-            Self::Grouping { expr } => self.evaluate(),
+            Self::Grouping { expr } => expr.evaluate(),
         }
     }
 

@@ -26,7 +26,7 @@ fn read_file() -> Result<(), String> {
 
 fn tokenize_file(contents: &str) {
     let mut scanner  = Tokenizer::new(contents);
-    let mut tokens = scanner.split_tokens();
+    let tokens = scanner.split_tokens();
     parse_file(tokens.to_vec());
 }
 fn parse_file(contents: Vec<Token>) {

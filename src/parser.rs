@@ -84,7 +84,7 @@ impl Parser {
     fn primary(self: &mut Self) -> Expression {
         let mut result: Expression;
         if matchtokens!(self, LeftParen) {
-            let mut expr = self.expression();
+            let expr = self.expression();
             result = Expression::Grouping { expr: Box::from(expr) };
         } else {
             if matchtokens!(self, FALSE) {
@@ -147,7 +147,8 @@ impl Parser {
     }
 
     fn print_statement(self: &mut Self) -> Statement {
-        let value = self.expression();
+        let expr = self.previous();
+        let value = Literal { value: expr.literal };
         return PrintStatement { expr: value };
     }
 
@@ -159,7 +160,7 @@ impl Parser {
     }
 
     fn var_declaration(self: &mut Self) -> Statement {
-        let mut initializer;
+        let initializer;
         if matchtokens!(self, Equal) {
             initializer =  self.expression();
         }
