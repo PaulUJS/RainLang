@@ -120,7 +120,10 @@ impl Tokenizer {
                 "true" => self.add_token(TRUE, "", BoolVal(true)),
                 "false" => self.add_token(FALSE, "", BoolVal(false)),
                 "return" => self.add_token(Return, "", Terminator),
-                "var" => self.add_token(Var, "", Identifier("var".to_string())),
+                "var" =>  {
+                    index += 1;
+                    self.add_token(Var, arr[index + 1], Identifier(arr[index].to_string()));
+                },
                 "for" => self.add_token(FOR, "", LOOP),
                 "while" => self.add_token(WHILE, "", LOOP),
                 "in" => self.add_token(In, "", Comparison),
@@ -155,6 +158,9 @@ impl Tokenizer {
                 "print" => {
                     if arr[index+1] == "'" {
                         index += 1;
+                    } else {
+                        // SYNTAX ERROR
+                        todo!()
                     }
 
                     let mut finalstr = "".to_owned();

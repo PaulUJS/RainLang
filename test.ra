@@ -1,4 +1,5 @@
 fn () start
     print 'hello world';
     20 + 10 * 2 - 50;
+    var test_var;
 end

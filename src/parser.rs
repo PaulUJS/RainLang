@@ -160,10 +160,10 @@ impl Parser {
     }
 
     fn var_declaration(self: &mut Self) -> Statement {
-        let initializer;
+        let mut initializer: Expression;
         if matchtokens!(self, Equal) {
             initializer =  self.expression();
-        }
+        };
         return VarStatement { name: todo!(), init: initializer };
     }
 
