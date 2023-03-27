@@ -18,7 +18,10 @@ impl Statement {
             Statement::PrintStatement { expr } => {
                 expr.evaluate()
             },
-            Statement::VarStatement { name, init } => todo!(),
+            Statement::VarStatement { name, init } => {
+                println!("variable {:#?} being evaluated", name.literal);
+                init.evaluate()
+            },
         }
     }
 

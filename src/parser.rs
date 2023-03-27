@@ -160,11 +160,11 @@ impl Parser {
     }
 
     fn var_declaration(self: &mut Self) -> Statement {
-        let mut initializer: Expression;
+        let name = self.previous();
         if matchtokens!(self, Equal) {
-            initializer =  self.expression();
+            return VarStatement { name: name, init: self.expression() }
         };
-        return VarStatement { name: todo!(), init: initializer };
+        panic!("Error occured with variable declaration");
     }
 
     fn declaration(self: &mut Self) -> Statement {

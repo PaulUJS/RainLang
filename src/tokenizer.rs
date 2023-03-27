@@ -158,24 +158,23 @@ impl Tokenizer {
                 "print" => {
                     if arr[index+1] == "'" {
                         index += 1;
-                    } else {
-                        // SYNTAX ERROR
-                        todo!()
-                    }
-
-                    let mut finalstr = "".to_owned();
-                    while arr[index + 1] != "'" {
-                        if finalstr != "" {
-                            finalstr.push_str(" ");
-                            finalstr.push_str(arr[index + 1]);
-                            index += 1;
-                        } else {
-                            finalstr.push_str(arr[index + 1]);
-                            index += 1;
+                    
+                        let mut finalstr = "".to_owned();
+                        while arr[index + 1] != "'" {
+                            if finalstr != "" {
+                                finalstr.push_str(" ");
+                                finalstr.push_str(arr[index + 1]);
+                                index += 1;
+                            } else {
+                                finalstr.push_str(arr[index + 1]);
+                                index += 1;
+                            }
                         }
-                    }
-                    index += 1;                        
-                    self.add_token(PRINT, &finalstr, StringVal(finalstr.to_string()));
+                        index += 1;                        
+                        self.add_token(PRINT, &finalstr, StringVal(finalstr.to_string()));
+                    } else {
+                        self.add_token(PRINT, "", NullVal);   
+                    };
                 },
                 "Null" => self.add_token(NULL, "", NullVal),
                 _ => { 
