@@ -5,6 +5,9 @@ use crate::LiteralVal::*;
 use crate::Expression::*;
 use crate::Statement::*;
 
+use crate::environment::*;
+use crate::Environment;
+
 macro_rules! matchtokens {
     ($parser:ident, $($token:ident),+) => {{
         let mut result = false;

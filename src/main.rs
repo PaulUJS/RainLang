@@ -9,6 +9,9 @@ use crate::parser::*;
 pub mod syntaxtree;
 use crate::syntaxtree::*;
 
+pub mod environment;
+use crate::environment::*;
+
 fn main() -> Result<(), String> {
     println!("Currently running rain program!");
     

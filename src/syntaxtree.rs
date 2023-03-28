@@ -30,7 +30,7 @@ impl Statement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     Binary { left: Box<Expression>, operator: Token, right: Box<Expression> },
     Unary { operator: Token, right: Box<Expression> },
