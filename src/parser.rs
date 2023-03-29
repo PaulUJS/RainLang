@@ -21,6 +21,7 @@ macro_rules! matchtokens {
 pub struct Parser {
     tokens: Vec<Token>,
     index: usize,
+    pub env: Environment,
 }
 
 impl Parser {
@@ -28,6 +29,7 @@ impl Parser {
         Self {
             tokens: _token,
             index: 0,
+            env: Environment::new(),
         }
     }
 
@@ -165,7 +167,15 @@ impl Parser {
     fn var_declaration(self: &mut Self) -> Statement {
         let name = self.previous();
         if matchtokens!(self, Equal) {
-            return VarStatement { name: name, init: self.expression() }
+            if matchtokens!(self, Quote) {
+                let val = self.expression();
+                self.env.define(name.lexeme.clone(), val.clone());
+                return VarStatement { name: name, init: val }
+            } else { 
+                let val = self.expression();
+                self.env.define(name.lexeme.clone(), val.clone());
+                return VarStatement { name: name, init: val }
+            }
         };
         panic!("Error occured with variable declaration");
     }

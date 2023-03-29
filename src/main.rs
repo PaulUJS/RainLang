@@ -37,4 +37,5 @@ fn parse_file(contents: Vec<Token>) {
    for mut i in parser.parse() {
        i.interpret();
    }
+   parser.env.print_env();
 }

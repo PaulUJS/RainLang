@@ -2,4 +2,6 @@ fn () start
     print 'hello world';
     20 + 10 * 2 - 50;
     var test_var = 10 + 10 - 5 * 5;
+    var next = 'helooooooooooooooo';
+    var final = 2000000;
 end

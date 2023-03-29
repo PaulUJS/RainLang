@@ -20,11 +20,20 @@ impl Environment {
         self.values.insert(name, val);
     }
 
-    pub fn get_var(self: &mut Self, name: String) -> Expression {
+    pub fn get_var(self: &mut Self, name: String) -> &Expression {
         if self.values.contains_key(&name) {
-            return self.values[&name].clone();
+            return &self.values[&name];
         } else {
             panic!();
+        }
+    }
+
+    pub fn print_env(self: &mut Self) {
+        println!("                              ");
+        println!("ALL VARIABLES IN THE RAIN FILE");
+        println!("                              ");
+        for (k, v) in &self.values {
+            println!("{} / {:#?}", k, v);
         }
     }
 }

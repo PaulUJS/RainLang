@@ -122,7 +122,7 @@ impl Tokenizer {
                 "return" => self.add_token(Return, "", Terminator),
                 "var" =>  {
                     index += 1;
-                    self.add_token(Var, arr[index + 1], Identifier(arr[index].to_string()));
+                    self.add_token(Var, arr[index], Identifier(arr[index].to_string()));
                 },
                 "for" => self.add_token(FOR, "", LOOP),
                 "while" => self.add_token(WHILE, "", LOOP),
@@ -190,7 +190,7 @@ impl Tokenizer {
             index += 1;
         }
         self.add_token(Eof, "", Terminator);
-       //  println!("{:#?}", self.tokens);
+        // println!("{:#?}", self.tokens);
         return &self.tokens;
     }
     
