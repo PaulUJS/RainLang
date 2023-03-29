@@ -15,6 +15,7 @@ pub enum LiteralVal {
     Grouping,
     LOOP,
     NullVal,
+    UnknownVal,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -58,6 +59,7 @@ pub enum TokenType {
 
     Return,
     NULL,
+    Unknown,
     Eof,
 }
 
@@ -184,13 +186,16 @@ impl Tokenizer {
                             Ok(value) => self.add_token(NumLiteral, arr[index], IntVal(value)),
                             Err(_) => println!("Unable to validate type of {}", arr[index].to_string()),
                         };
-                    };
+                    } else {
+                        self.add_token(Unknown, arr[index], UnknownVal);
+                    }
+                    
                 },
             };
             index += 1;
         }
         self.add_token(Eof, "", Terminator);
-        // println!("{:#?}", self.tokens);
+        println!("{:#?}", self.tokens);
         return &self.tokens;
     }
     

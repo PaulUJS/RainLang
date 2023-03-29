@@ -19,7 +19,7 @@ impl Statement {
                 expr.evaluate()
             },
             Statement::VarStatement { name, init } => {
-                // println!("variable {:#?} being evaluated", name.lexeme);
+                 println!("variable {:#?} being evaluated", name.lexeme);
                 init.evaluate()
             },
         }
